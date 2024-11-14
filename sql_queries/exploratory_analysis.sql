@@ -1,14 +1,10 @@
--- Total Sales: Calculate the total sales value from the cleaned_order_items table. Result should be 15,843,553.24
+-- Total Sales by Revenue, Orders and Items Sold
 SELECT
-    FORMAT('%0.2f', SUM(order_value_total)) AS total_sales
+    ROUND(SUM(order_value_total), 2) AS total_sales,
+    COUNT(DISTINCT order_id) AS total_orders,
+    COUNT(product_id) AS total_items_sold
 FROM
     olist.cleaned_order_items;
-
--- Total Orders: Count the number of unique order_id in the cleaned_orders table. Result should be 99,441 orders
-SELECT
-    COUNT(DISTINCT order_id) AS total_orders
-FROM
-    olist.cleaned_orders;
 
 -- Average Order Value: Calculate the average value of each order. Result should be 140.64
 SELECT
@@ -20,7 +16,7 @@ FROM
 SELECT
     purchase_year,
     purchase_month,
-    FORMAT('%0.2f', AVG(order_value_total)) AS avg_order_value
+    ROUND(AVG(order_value_total), 2) AS avg_order_value
 FROM
     olist.cleaned_orders
     JOIN olist.cleaned_order_items USING (order_id)
@@ -35,7 +31,7 @@ ORDER BY
 SELECT
     purchase_year,
     purchase_month,
-    FORMAT('%0.2f', SUM(order_value_total)) AS total_sales
+    ROUND(SUM(order_value_total), 2) AS total_sales
 FROM
     olist.cleaned_orders
     JOIN olist.cleaned_order_items USING (order_id)
@@ -49,13 +45,40 @@ ORDER BY
 -- Customer Distribution by State
 SELECT
     customer_state,
+    customer_zip_code_prefix,
     COUNT(DISTINCT customer_id) AS total_customers
 FROM
     olist.customers
 GROUP BY
-    customer_state
+    customer_state,
+    customer_zip_code_prefix
 ORDER BY
     total_customers DESC;
+
+-- Customer Distribution by lat and lng
+WITH
+    avg_lat_lng AS (
+        SELECT
+            geolocation_zip_code_prefix,
+            AVG(geolocation_lat) AS avg_lat,
+            AVG(geolocation_lng) AS avg_lng
+        FROM
+            olist.geolocation
+        GROUP BY
+            geolocation_zip_code_prefix
+    )
+SELECT
+    customer_id,
+    customer_city,
+    customer_state,
+    customer_zip_code_prefix,
+    avg_lat,
+    avg_lng
+FROM
+    olist.customers AS c
+    JOIN avg_lat_lng AS a ON c.customer_zip_code_prefix = a.geolocation_zip_code_prefix
+ORDER BY
+    customer_id;
 
 -- Customer Distribution by City
 SELECT
@@ -174,3 +197,14 @@ FROM
     olist.cleaned_orders
 GROUP BY
     order_status;
+
+SELECT
+    purchase_month,
+    FORMAT('%0.2f', SUM(order_value_total)) AS total_sales
+FROM
+    olist.cleaned_orders
+    JOIN olist.cleaned_order_items USING (order_id)
+GROUP BY
+    purchase_month
+ORDER BY
+    purchase_month;
