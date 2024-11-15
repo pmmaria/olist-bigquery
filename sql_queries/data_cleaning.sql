@@ -26,7 +26,7 @@ FROM
     olist.orders;
 
 /* 
-Create a new table for order_items with a column for total value of each order (price + freight_value)
+Create a table for order_items with a column for total value of each order (price + freight_value)
 */
 CREATE TABLE olist.cleaned_order_items AS
 SELECT

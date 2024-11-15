@@ -29,8 +29,16 @@ ORDER BY
 
 -- Total Sales per Month and Year
 SELECT
-    purchase_year,
-    purchase_month,
+    extract(
+        year
+        FROM
+            order_purchase_date
+    ) AS purchase_year,
+    extract(
+        month
+        FROM
+            order_purchase_date
+    ) as purchase_month,
     ROUND(SUM(order_value_total), 2) AS total_sales
 FROM
     olist.cleaned_orders
@@ -160,15 +168,33 @@ GROUP BY
 ORDER BY
     total_orders DESC;
 
---Customer Retention: Repeat Customers. Result: none of customers have made more than 1 order
+--Customer Retention: Repeat Customers
+with
+    repeat_customer_unique_ids as (
+        select
+            a.customer_unique_id
+        FROM
+            olist.customers a
+            JOIN olist.orders USING (customer_id)
+        GROUP BY
+            a.customer_unique_id
+        HAVING
+            COUNT(order_id) > 1
+    ),
+    repeat_customers as (
+        select
+            a.customer_unique_id,
+            b.customer_id
+        from
+            repeat_customer_unique_ids a
+            inner join olist.customers b using (customer_unique_id)
+    )
 SELECT
-    COUNT(DISTINCT customer_id) AS repeat_customers
-FROM
-    olist.cleaned_orders
-GROUP BY
-    customer_id
-HAVING
-    COUNT(DISTINCT order_id) > 1;
+    *
+from
+    repeat_customers
+order by
+    customer_unique_id;
 
 -- Average Delivery Time by Order Status 
 SELECT
