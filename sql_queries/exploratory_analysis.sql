@@ -1,31 +1,16 @@
 -- Total Sales by Revenue, Orders and Items Sold
 SELECT
-    ROUND(SUM(order_value_total), 2) AS total_sales,
-    COUNT(DISTINCT order_id) AS total_orders,
+    ROUND(SUM(order_value_total), 2) as total_sales,
+    COUNT(DISTINCT order_id) total_orders,
     COUNT(product_id) AS total_items_sold
 FROM
     olist.cleaned_order_items;
 
 -- Average Order Value: Calculate the average value of each order. Result should be 140.64
 SELECT
-    FORMAT('%0.2f', AVG(order_value_total)) AS avg_order_value
+    round(AVG(order_value_total), 2) AS avg_order_value
 FROM
     olist.cleaned_order_items;
-
--- Average Order Value per Month and Year
-SELECT
-    purchase_year,
-    purchase_month,
-    ROUND(AVG(order_value_total), 2) AS avg_order_value
-FROM
-    olist.cleaned_orders
-    JOIN olist.cleaned_order_items USING (order_id)
-GROUP BY
-    purchase_year,
-    purchase_month
-ORDER BY
-    purchase_year,
-    purchase_month;
 
 -- Total Sales per Month and Year
 SELECT
@@ -62,89 +47,6 @@ GROUP BY
     customer_zip_code_prefix
 ORDER BY
     total_customers DESC;
-
--- Customer Distribution by lat and lng
-WITH
-    avg_lat_lng AS (
-        SELECT
-            geolocation_zip_code_prefix,
-            AVG(geolocation_lat) AS avg_lat,
-            AVG(geolocation_lng) AS avg_lng
-        FROM
-            olist.geolocation
-        GROUP BY
-            geolocation_zip_code_prefix
-    )
-SELECT
-    customer_id,
-    customer_city,
-    customer_state,
-    customer_zip_code_prefix,
-    avg_lat,
-    avg_lng
-FROM
-    olist.customers AS c
-    JOIN avg_lat_lng AS a ON c.customer_zip_code_prefix = a.geolocation_zip_code_prefix
-ORDER BY
-    customer_id;
-
--- Customer Distribution by City
-SELECT
-    customer_city,
-    COUNT(DISTINCT customer_id) AS total_customers
-FROM
-    olist.customers
-GROUP BY
-    customer_city
-ORDER BY
-    total_customers DESC;
-
--- Top 10 Customers by Total Spending
-SELECT
-    customer_id,
-    customer_city,
-    customer_state,
-    FORMAT('%0.2f', SUM(order_value_total)) AS total_spent
-FROM
-    olist.cleaned_orders
-    JOIN olist.cleaned_order_items USING (order_id)
-    JOIN olist.customers USING (customer_id)
-GROUP BY
-    customer_id,
-    customer_city,
-    customer_state
-ORDER BY
-    total_spent DESC
-LIMIT
-    10;
-
--- Top 10 Categories by Total Sales (sales includes freight value)
-SELECT
-    product_category,
-    FORMAT('%0.2f', SUM(order_value_total)) AS total_sales
-FROM
-    olist.cleaned_order_items
-    JOIN olist.cleaned_products USING (product_id)
-GROUP BY
-    product_category
-ORDER BY
-    total_sales DESC
-LIMIT
-    10;
-
--- Top 10 Categories by Total Orders
-SELECT
-    product_category,
-    COUNT(order_id) AS total_orders
-FROM
-    olist.cleaned_order_items
-    JOIN olist.cleaned_products USING (product_id)
-GROUP BY
-    product_category
-ORDER BY
-    total_orders DESC
-LIMIT
-    10;
 
 -- Orders by Payment Type
 SELECT
