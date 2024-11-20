@@ -84,3 +84,35 @@ CREATE OR REPLACE TABLE olist.cleaned_products AS (
         category_translation AS ct
         JOIN olist.products AS p ON p.product_category_name = ct.category_name_portuguese
 );
+
+-- Add a new column to the customers table with the region of the customer based on the state.
+CREATE OR REPLACE TABLE olist.customers AS
+SELECT
+    customer_id,
+    customer_unique_id,
+    customer_zip_code_prefix,
+    customer_city,
+    customer_state,
+    (
+        CASE
+            WHEN customer_state in ('RO', 'AC', 'AM', 'RR', 'AP', 'PA', 'TO') THEN 'north'
+            WHEN customer_state in (
+                'MA',
+                'PI',
+                'CE',
+                'RN',
+                'PB',
+                'PE',
+                'AL',
+                'SE',
+                'BA'
+            ) THEN 'northeast'
+            WHEN customer_state in ('MT', 'MS', 'GO', 'DF') THEN 'midwest'
+            WHEN customer_state in ('PR', 'SC', 'RS') THEN 'south'
+            WHEN customer_state in ('SP', 'RJ', 'ES', 'MG') THEN 'southeast'
+            ELSE 'unknown'
+        END
+    ) as customer_region,
+    'brazil' as customer_country
+from
+    olist.customers;
