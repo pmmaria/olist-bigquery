@@ -80,7 +80,7 @@ In order to facilitate the analysis, the first step is clean and prepare the dat
 4. **Customers Table**:
    - Added a new column for the **region of the customer**, based on the state. Simplified analysis by grouping states into the 5 geographical regions of Brazil.
 
-For the full SQL queries used in this process, see [Data Cleaning Queries](sql_queries\data_cleaning.sql)
+For the full SQL queries used in this process, see [Data Cleaning Queries](sql_queries\01_data_cleaning.sql)
 
 
 
@@ -89,7 +89,7 @@ For the full SQL queries used in this process, see [Data Cleaning Queries](sql_q
 The exploratory analysis focuses on understanding the dataset through key metrics and visualizations. The following analyses were conducted:
 
 1. **Total Sales**:
-   - Measured by total revenue, total orders, and total items sold.
+   - Measured by total revenue, items sold and number of orders placed. This provides an overview of the business.
 
 2. **Average Order Value**:
    - Calculated the average value of each order to understand customer spending patterns.
@@ -107,3 +107,5 @@ The exploratory analysis focuses on understanding the dataset through key metric
    - Analyzed the count of orders by status, such as delivered, shipped, or canceled.
 
 Each analysis provides insights into customer behavior, sales trends, and operational performance.
+
+SQL queries used for this part of the analysis [Here](sql_queries/02_exploratory_analysis.sql) 
