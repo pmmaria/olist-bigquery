@@ -34,7 +34,10 @@ FROM
       aggregated_payments AS (
         SELECT
           order_id,
-          STRING_AGG(payment_type, ', ') AS payment_types,
+          CASE
+            WHEN COUNT(DISTINCT payment_type) > 1 THEN 'combined_payment'
+            ELSE MAX(payment_type)
+          END AS payment_types,
           SUM(payment_value) AS total_payment_value
         FROM
           olist.order_payments
